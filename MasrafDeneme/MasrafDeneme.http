@@ -1,0 +1,6 @@
+@MasrafDeneme_HostAddress = http://localhost:5071
+
+GET {{MasrafDeneme_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
