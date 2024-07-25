@@ -1,16 +1,13 @@
+using Hangfire;
+using Hangfire.MemoryStorage;
 using MasrafDeneme.Data;
-using MasrafDeneme.Jobs;
+using MasrafDeneme.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Quartz;
-using Quartz.Impl;
-using Quartz.Spi;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -41,7 +38,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -74,8 +70,9 @@ builder.Services.AddHangfire(x => x.UseMemoryStorage(new MemoryStorageOptions()
 builder.Services.AddHangfireServer();
 
 
-var app = builder.Build();
+builder.Services.AddScoped<Aggregate>();
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -89,5 +86,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+app.UseHangfireDashboard("/job", new DashboardOptions
+{
+
+});
 
 app.Run();
